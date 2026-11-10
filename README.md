@@ -4,6 +4,20 @@ Confirm who you are paying before crypto leaves. Payee Lock is an open registry 
 
 This is a NEAR HACKATHON project (development ends 2026-11-14 23:59 UTC). The chain is NEAR testnet. Nothing here holds real funds.
 
+## Hosted demo
+
+No install. The site stays up through judging (18 November 2026, and ideally through 25 November).
+
+- App: https://payee-lock.vercel.app
+- Demo: https://payee-lock.vercel.app/demo
+
+1. Payee Acme, chain Ethereum. Paste `0x4e8fa91c0d4e77b2c61890ab44f13c8e06e35d17` and check. See **Do not pay**, plus a lookalike warning (first 4 and last 6 characters match the address on file).
+2. Paste `0x4e8f1c2a9b7d6e5c3a18f0d4b27c91aa06e35d17` and check. See **Match**: this is Acme Treasury's real Ethereum address.
+3. Click **Get a live quote**. If Intents answers, see its live amounts and a label that execution is simulated. If it does not answer within about 12 seconds, the page says "NEAR Intents didn't respond in time. Try again." and shows a retry button. It does not invent amounts or spin forever.
+4. Open `/demo`, choose **Propose the address swap**, and see a 3 minute countdown. During that window the old Ethereum address still matches. Then **Veto with the guardian key**. See the proposal removed.
+
+Curl examples and `scripts/agent-verify.mjs` are in [Try it](#try-it).
+
 ## The problem
 
 UK, EU, Australian, and New Zealand banks run Confirmation of Payee: before money moves, the payer is told whether the account name matches the account they typed. The UK Payment Systems Regulator, citing Pay.UK, reports a **59% reduction in Faster Payments claims for payments sent to the wrong account** since Confirmation of Payee launched, and a 20–40% reduction in losses for some fraud types ([PSR CP26/2, July 2026](https://www.psr.org.uk/media/ugtogbad/cp26-2-extending-specific-direction-17-july-2026.pdf)).
@@ -73,7 +87,38 @@ Poisoned invoice address (not registered): `0x4e8fa91c0d4e77b2c61890ab44f13c8e06
 
 Do this, and you should see that.
 
-### Read the live registry (no keys, no wallet)
+### Hosted demo (no install)
+
+The site stays up through judging (18 November 2026, and ideally through 25 November): [https://payee-lock.vercel.app](https://payee-lock.vercel.app) and [https://payee-lock.vercel.app/demo](https://payee-lock.vercel.app/demo).
+
+1. Set the payee to Acme and the chain to Ethereum. Paste `0x4e8fa91c0d4e77b2c61890ab44f13c8e06e35d17` and click **Check this address**. See **Do not pay** ("This does not belong to Acme Treasury") and a lookalike warning. The warning reports the first 4 and last 6 characters.
+2. Paste `0x4e8f1c2a9b7d6e5c3a18f0d4b27c91aa06e35d17` and check again. See **Match** ("This is Acme Treasury's real Ethereum address").
+3. Click **Get a live quote**. The app calls `https://1click.chaindefuser.com/v0/quote` with `dry: true` for 10 USDC on NEAR, paid out as USDC on Ethereum to the address that currently matches. It does not send funds. If Intents returns a quote, the amounts on the page are those amounts and execution is labeled simulated. Each attempt waits at most about 12 seconds, then retries once. If both fail, the page says "NEAR Intents didn't respond in time. Try again." and offers **Try again**. It does not invent amounts.
+4. Open https://payee-lock.vercel.app/demo. Click **Propose the address swap**. See a countdown of 3 minutes (the payee's delay is 180 seconds). While it is counting, a check of `0x4e8f1c2a9b7d6e5c3a18f0d4b27c91aa06e35d17` still returns match, and the poisoned address is `pending_change`. Click **Veto with the guardian key**. See the proposal removed: the poisoned address is `no_match` again and the address on file is unchanged.
+
+These reads were checked against the hosted API:
+
+```bash
+curl -sS "https://payee-lock.vercel.app/api/verify?payee=acme&chain=ethereum&address=0x4e8fa91c0d4e77b2c61890ab44f13c8e06e35d17"
+# status: no_match, lookalike prefix 4, suffix 6
+
+curl -sS "https://payee-lock.vercel.app/api/verify?payee=acme&chain=ethereum&address=0x4e8f1c2a9b7d6e5c3a18f0d4b27c91aa06e35d17"
+# status: match
+```
+
+`PAYEE_LOCK_URL=https://payee-lock.vercel.app` works with the agent script (the script still runs on your machine; it calls the hosted API):
+
+```bash
+PAYEE_LOCK_URL=https://payee-lock.vercel.app node scripts/agent-verify.mjs --payee acme --chain ethereum --address 0x4e8fa91c0d4e77b2c61890ab44f13c8e06e35d17
+# exit 2: Refusing to pay
+
+PAYEE_LOCK_URL=https://payee-lock.vercel.app node scripts/agent-verify.mjs --payee acme --chain ethereum --address 0x4e8f1c2a9b7d6e5c3a18f0d4b27c91aa06e35d17
+# exit 0: Payee confirmed
+```
+
+Propose and veto on the hosted demo are real testnet transactions. They were checked on 10 November 2026 (propose `8fe6HVrFMhR2gMtd1YBrEHA1n6fbQsK3pfmiS3oj8bS3`, veto `1bMRcLRL8hw2QxUPUzcAmcTa7JrB4ufR85ArLsKrQLm`). The registry was left with no pending change.
+
+### Run it yourself
 
 ```bash
 npm install
@@ -87,7 +132,7 @@ Open http://localhost:3000.
 2. Replace the address with `0x4e8f1c2a9b7d6e5c3a18f0d4b27c91aa06e35d17` and check again.
    See a green **Match**: "This is Acme Treasury's real Ethereum address", then a payment panel.
 3. Click **Get a live quote**.
-   See real amounts from NEAR Intents and a banner that execution is simulated. **Execute swap** does not send funds. It explains that a non-dry quote was not requested.
+   See live NEAR Intents amounts and a banner that execution is simulated, or, if Intents is slow, "NEAR Intents didn't respond in time. Try again." with a retry button. **Execute swap** does not send funds.
 4. Open **Acme** in the header.
    See one address per chain, no pending change, and the registration in the activity log.
 
@@ -221,7 +266,7 @@ The site is a Next.js app at the repository root. No adapter and no wallet packa
 | Intents execution | **Simulated.** The UI says so. `dry: true` does not create a deposit address and this demo never sends funds. Intents has no testnet. |
 | The invoice email | A prop. The address in it is the poisoned example above. |
 
-If the quote request fails, the page shows the error. It does not invent amounts.
+If the quote request fails or times out, the page says so and does not invent amounts. A slow Intents call is cut off after about 12 seconds, with one retry.
 
 ## API
 
@@ -256,15 +301,18 @@ cargo build --manifest-path contract/Cargo.toml --release --target wasm32-unknow
 
 Events, as `EVENT_JSON` with standard `payee-lock` and version `1.0.0`: `payee_registered`, `address_proposed`, `address_vetoed`, `address_activated`, `guardian_set`.
 
-## Code this project uses
+## Built with
 
-Written for this hackathon. The repository's first commit is a one-line README; there is no pre-hackathon product.
+Built during the hackathon window, which runs through 2026-11-14 23:59 UTC. Most of the code was written with AI coding assistance. The first commit in the repository is a one-line README. There is no earlier product.
 
-- `near-sdk` 5.30.1
-- `near-cli-rs` 0.31.1 (account creation, used by `scripts/seed.mjs`)
-- `near-api-js` 7.4.0 (server-side signing and the seed script)
-- Next.js 15 and React 19
-- NEAR Intents 1Click at `https://1click.chaindefuser.com`
+From `package.json` and `contract/Cargo.toml`:
+
+- Next.js 15 (`next` ^15.5.4) and React 19 (`react` and `react-dom` ^19.1.1)
+- `near-api-js` 7.4.0, for server-side signing
+- TypeScript (`typescript` ^5.9.2)
+- `near-sdk` 5.30.1, for the Rust contract
+
+`scripts/seed.mjs` also calls `near-cli-rs` (0.31.1 when the testnet account was created). The quote route calls the NEAR Intents 1Click API at `https://1click.chaindefuser.com`.
 
 ## Limitations and what should come next
 
