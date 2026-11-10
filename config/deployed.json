@@ -1,21 +1,21 @@
 {
   "networkId": "testnet",
   "rpcUrl": "https://test.rpc.fastnear.com",
-  "contractId": "plock03ae.testnet",
+  "contractId": "plock5dfa73.testnet",
   "minDelaySeconds": 60,
   "recommendedDelaySeconds": 259200,
   "demoDelaySeconds": 180,
-  "guardianAccountId": "guardian.plock03ae.testnet",
+  "guardianAccountId": "guardian.plock5dfa73.testnet",
   "explorerAccount": "https://testnet.nearblocks.io/address",
   "payees": [
     {
       "slug": "acme",
-      "accountId": "acme.plock03ae.testnet",
+      "accountId": "acme.plock5dfa73.testnet",
       "displayName": "Acme Treasury",
       "delaySeconds": 180,
-      "guardianAccountId": "guardian.plock03ae.testnet",
+      "guardianAccountId": "guardian.plock5dfa73.testnet",
       "addresses": {
-        "near": "acme.plock03ae.testnet",
+        "near": "acme.plock5dfa73.testnet",
         "ethereum": "0x4e8f1c2a9b7d6e5c3a18f0d4b27c91aa06e35d17",
         "solana": "4fYNw3dojWmQ4dXtSGE9epjRGy9pFSx62YypT7avPYvA",
         "bitcoin": "tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx"
@@ -28,12 +28,12 @@
     },
     {
       "slug": "globex",
-      "accountId": "globex.plock03ae.testnet",
+      "accountId": "globex.plock5dfa73.testnet",
       "displayName": "Globex Payments",
       "delaySeconds": 180,
-      "guardianAccountId": "guardian.plock03ae.testnet",
+      "guardianAccountId": "guardian.plock5dfa73.testnet",
       "addresses": {
-        "near": "globex.plock03ae.testnet",
+        "near": "globex.plock5dfa73.testnet",
         "ethereum": "0x91c4b7e0a25d48f13c6aa0917e5d44b0c8f12a6d",
         "solana": "HN7cABqLq46Es1jh92dQQisAq662SmxELLLsHHe4YWrH",
         "bitcoin": "tb1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3q0sl5k7"
@@ -41,12 +41,12 @@
     },
     {
       "slug": "initech",
-      "accountId": "initech.plock03ae.testnet",
+      "accountId": "initech.plock5dfa73.testnet",
       "displayName": "Initech Payroll",
       "delaySeconds": 180,
-      "guardianAccountId": "guardian.plock03ae.testnet",
+      "guardianAccountId": "guardian.plock5dfa73.testnet",
       "addresses": {
-        "near": "initech.plock03ae.testnet",
+        "near": "initech.plock5dfa73.testnet",
         "ethereum": "0x0d5e2a77c1b948e36f0a14d2c7bb9051e8a3c64f",
         "solana": "DYw8jCTfwHNRJhhmFcbXvVDTqWMEVFBX6ZKUmG5CNSKK",
         "bitcoin": "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4"

@@ -46,7 +46,7 @@ sequenceDiagram
 
 | Feature | Where | Why it is the right tool |
 | --- | --- | --- |
-| Named accounts | Payees are accounts such as `acme.plock03ae.testnet` | The thing you check is a name, not a 40-character hex string someone pasted into an email. |
+| Named accounts | Payees are accounts such as `acme.plock5dfa73.testnet` | The thing you check is a name, not a 40-character hex string someone pasted into an email. |
 | Contract-enforced delay | `propose_address` stores `activates_at_ms`. `verify` ignores the proposal until `env::block_timestamp()` passes it. | A stolen key cannot silently retarget payments. The old address stays authoritative, and the window is enforced by the contract, not by the website. |
 | Guardian the owner cannot dismiss | `set_guardian` lets the payee appoint a guardian once. After that only the guardian can rotate it. There is no clear. | The key that publishes a swap must not be the key that can delete the veto. |
 | One account, many chains | Addresses are stored per chain on the same NEAR account | The payee identity is the NEAR account. Ethereum, Solana, and Bitcoin addresses hang off it. Chain signatures (NEAR's MPC signer) are the way that account would later *sign* on those chains. This registry records the addresses and time-locks changes. It does not call the MPC contract. |
@@ -55,17 +55,17 @@ sequenceDiagram
 
 The contract is Rust and `near-sdk` 5.30.1. Methods use `snake_case`. Views are free and need no account. `register` requires 0.02 NEAR attached so the contract can cover the new state.
 
-**Deployed contract:** [`plock03ae.testnet`](https://testnet.nearblocks.io/address/plock03ae.testnet)
+**Deployed contract:** [`plock5dfa73.testnet`](https://testnet.nearblocks.io/address/plock5dfa73.testnet)
 
 Initialized with a **60 second** minimum delay so the window is visible. `get_config` also returns the production recommendation: **259200 seconds (72 hours)**. A mainnet deployment should `init` with that floor. The three demo payees register with a **180 second** delay so a person can watch the countdown and still veto.
 
 | Payee | Account | Ethereum address that verifies |
 | --- | --- | --- |
-| Acme Treasury | `acme.plock03ae.testnet` | `0x4e8f1c2a9b7d6e5c3a18f0d4b27c91aa06e35d17` |
-| Globex Payments | `globex.plock03ae.testnet` | `0x91c4b7e0a25d48f13c6aa0917e5d44b0c8f12a6d` |
-| Initech Payroll | `initech.plock03ae.testnet` | `0x0d5e2a77c1b948e36f0a14d2c7bb9051e8a3c64f` |
+| Acme Treasury | `acme.plock5dfa73.testnet` | `0x4e8f1c2a9b7d6e5c3a18f0d4b27c91aa06e35d17` |
+| Globex Payments | `globex.plock5dfa73.testnet` | `0x91c4b7e0a25d48f13c6aa0917e5d44b0c8f12a6d` |
+| Initech Payroll | `initech.plock5dfa73.testnet` | `0x0d5e2a77c1b948e36f0a14d2c7bb9051e8a3c64f` |
 
-Guardian for all three: `guardian.plock03ae.testnet`.
+Guardian for all three: `guardian.plock5dfa73.testnet`.
 
 Poisoned invoice address (not registered): `0x4e8fa91c0d4e77b2c61890ab44f13c8e06e35d17`. It copies the first 4 and last 8 hex characters of Acme's address.
 
@@ -137,7 +137,7 @@ npm run dev
 
 `npm run seed` uses `near-cli-rs` `sponsor-by-faucet-service` to create a contract account when you do not already have one, funds subaccounts from that balance, builds the wasm if needed, deploys, registers Acme, Globex, and Initech, and writes `.env.local`. It does not print the keys. Restart `npm run dev` after seeding so Next.js loads the new env file.
 
-If `config/deployed.json` already points at `plock03ae.testnet` and you do not have that account's key, set a fresh name and seed your own deployment:
+If `config/deployed.json` already points at `plock5dfa73.testnet` and you do not have that account's key, set a fresh name and seed your own deployment:
 
 ```bash
 CONTRACT_ACCOUNT_ID=your-name.testnet npm run seed
@@ -187,7 +187,7 @@ Copy `.env.example` to `.env.local`. `npm run seed` fills the secrets. Do not co
 
 | Variable | Required for | Purpose |
 | --- | --- | --- |
-| `CONTRACT_ID` | Reads, if you are not using the committed config | Contract account. Committed default: `plock03ae.testnet`. |
+| `CONTRACT_ID` | Reads, if you are not using the committed config | Contract account. Committed default: `plock5dfa73.testnet`. |
 | `NEAR_RPC_URL` | Optional | Public testnet RPC. Default `https://test.rpc.fastnear.com`. |
 | `ACME_ACCOUNT_ID`, `ACME_PRIVATE_KEY` | Propose and register for Acme | Same pair for `GLOBEX_*` and `INITECH_*`. |
 | `GUARDIAN_ACCOUNT_ID`, `GUARDIAN_PRIVATE_KEY` | Veto and settle | Separate from the payee keys. |
@@ -204,7 +204,7 @@ The contract account's full-access key stays in the near-cli legacy keychain (`~
 The site is a Next.js app at the repository root. No adapter and no wallet package.
 
 1. Import the GitHub repository. Framework preset: Next.js. Root directory: the repository root.
-2. Deploy. Reads work with no environment variables, because `config/deployed.json` names `plock03ae.testnet` and the public RPC.
+2. Deploy. Reads work with no environment variables, because `config/deployed.json` names `plock5dfa73.testnet` and the public RPC.
 3. To enable propose and veto on the hosted demo, add the variables from `.env.local` in the Vercel project settings and redeploy. Keep the site up through judging (18 November 2026, ideally 25 November).
 
 `next build` is the production build. It completes with the pages `/`, `/demo`, `/payee/[account]`, and the `/api/*` routes.
@@ -213,7 +213,7 @@ The site is a Next.js app at the repository root. No adapter and no wallet packa
 
 | Action | Real? |
 | --- | --- |
-| Contract on NEAR testnet, including register, verify, propose, veto, settle | Real. `plock03ae.testnet`. |
+| Contract on NEAR testnet, including register, verify, propose, veto, settle | Real. `plock5dfa73.testnet`. |
 | View calls from the app and from `/api/verify` | Real public RPC. No wallet. |
 | Propose and veto in the demo | Real transactions, signed on the server with the demo keys. |
 | Lookalike warning | Real comparison in the app. Not stored on chain. |
@@ -227,7 +227,7 @@ If the quote request fails, the page shows the error. It does not invent amounts
 
 `GET /api/verify?payee=&chain=&address=`
 
-`payee` is an account id (`acme.plock03ae.testnet`) or a display name / first label (`acme`). `chain` is `near`, `ethereum` (`eth` and `evm` too), `base`, `arbitrum`, `polygon`, `solana`, or `bitcoin`.
+`payee` is an account id (`acme.plock5dfa73.testnet`) or a display name / first label (`acme`). `chain` is `near`, `ethereum` (`eth` and `evm` too), `base`, `arbitrum`, `polygon`, `solana`, or `bitcoin`.
 
 `GET /api/payee?account=` · `GET /api/payees` · `GET /api/activity?payee=&limit=`
 

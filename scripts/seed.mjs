@@ -13,7 +13,7 @@ import demo from "../config/demo-payees.json" with { type: "json" };
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const RPC = process.env.NEAR_RPC_URL || "https://test.rpc.fastnear.com";
-const PARENT = process.env.CONTRACT_ACCOUNT_ID || "plock03ae.testnet";
+const PARENT = process.env.CONTRACT_ACCOUNT_ID || "plock5dfa73.testnet";
 const CRED = path.join(process.env.HOME || "", ".near-credentials", "testnet", `${PARENT}.json`);
 const WASM = path.join(ROOT, "contract/target/wasm32-unknown-unknown/release/payee_lock.wasm");
 const ENV_PATH = path.join(ROOT, ".env.local");
