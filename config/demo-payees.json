@@ -1,0 +1,37 @@
+{
+  "delaySeconds": 180,
+  "payees": [
+    {
+      "slug": "acme",
+      "displayName": "Acme Treasury",
+      "addresses": {
+        "ethereum": "0x4e8f1c2a9b7d6e5c3a18f0d4b27c91aa06e35d17",
+        "solana": "4fYNw3dojWmQ4dXtSGE9epjRGy9pFSx62YypT7avPYvA",
+        "bitcoin": "tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx"
+      },
+      "poison": {
+        "chain": "ethereum",
+        "address": "0x4e8fa91c0d4e77b2c61890ab44f13c8e06e35d17",
+        "note": "Same first 4 and last 8 hex characters as Acme's Ethereum address. The middle is different."
+      }
+    },
+    {
+      "slug": "globex",
+      "displayName": "Globex Payments",
+      "addresses": {
+        "ethereum": "0x91c4b7e0a25d48f13c6aa0917e5d44b0c8f12a6d",
+        "solana": "HN7cABqLq46Es1jh92dQQisAq662SmxELLLsHHe4YWrH",
+        "bitcoin": "tb1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3q0sl5k7"
+      }
+    },
+    {
+      "slug": "initech",
+      "displayName": "Initech Payroll",
+      "addresses": {
+        "ethereum": "0x0d5e2a77c1b948e36f0a14d2c7bb9051e8a3c64f",
+        "solana": "DYw8jCTfwHNRJhhmFcbXvVDTqWMEVFBX6ZKUmG5CNSKK",
+        "bitcoin": "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4"
+      }
+    }
+  ]
+}

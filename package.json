@@ -1,0 +1,28 @@
+{
+  "name": "payee-lock",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Confirmation of payee for crypto. An open NEAR registry with time-locked address changes.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "test:contract": "cargo test --manifest-path contract/Cargo.toml",
+    "test:lookalike": "node --experimental-strip-types --test lib/lookalike.test.ts",
+    "seed": "node scripts/seed.mjs",
+    "agent": "node scripts/agent-verify.mjs"
+  },
+  "dependencies": {
+    "near-api-js": "7.4.0",
+    "next": "^15.5.4",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.0",
+    "@types/react": "^19.1.12",
+    "@types/react-dom": "^19.1.9",
+    "typescript": "^5.9.2"
+  }
+}
