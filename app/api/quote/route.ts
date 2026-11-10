@@ -1,10 +1,11 @@
-import { dryQuote } from "@/lib/intents";
+import { dryQuote, INTENTS_TIMEOUT_CODE, QuoteError } from "@/lib/intents";
 import type { OriginId } from "@/lib/origins";
 import { resolvePayee, view } from "@/lib/rpc";
 import type { PayeeView, VerifyResult } from "@/lib/types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+export const maxDuration = 25;
 
 export async function POST(request: Request) {
   let body: { payee?: string; origin?: OriginId };
@@ -43,7 +44,15 @@ export async function POST(request: Request) {
     const quote = await dryQuote(body.origin, ethereum.current);
     return Response.json(quote);
   } catch (error) {
+    const timedOut = error instanceof QuoteError && error.code === INTENTS_TIMEOUT_CODE;
     const message = error instanceof Error ? error.message : "Quote failed";
-    return Response.json({ error: message, simulatedExecution: true }, { status: 502 });
+    return Response.json(
+      {
+        error: message,
+        code: timedOut ? INTENTS_TIMEOUT_CODE : "intents_error",
+        simulatedExecution: true,
+      },
+      { status: timedOut ? 504 : 502 },
+    );
   }
 }

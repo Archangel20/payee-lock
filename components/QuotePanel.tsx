@@ -16,15 +16,40 @@ export function QuotePanel({ payee, ready }: { payee: string; ready: boolean }) 
     setError(null);
     setAsked(false);
     setQuote(null);
-    const response = await fetch("/api/quote", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ payee, origin }),
-    });
-    const body = await response.json();
-    if (!response.ok) setError(body.error ?? "Quote failed");
-    else setQuote(body as QuoteResponse);
-    setLoading(false);
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => controller.abort(), 20_000);
+    try {
+      const response = await fetch("/api/quote", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ payee, origin }),
+        signal: controller.signal,
+      });
+      const body = (await response.json().catch(() => ({}))) as {
+        error?: string;
+        code?: string;
+      } & Partial<QuoteResponse>;
+      const timedOut = body.code === "intents_timeout" || response.status === 504;
+      if (!response.ok || timedOut) {
+        setError(timedOut ? "NEAR Intents didn't respond in time. Try again." : (body.error ?? "Quote failed"));
+        return;
+      }
+      if (!body.amountOutFormatted) {
+        setError("Quote failed");
+        return;
+      }
+      setQuote(body as QuoteResponse);
+    } catch (error) {
+      const aborted = error instanceof DOMException && error.name === "AbortError";
+      setError(
+        aborted
+          ? "NEAR Intents didn't respond in time. Try again."
+          : "Could not reach the quote service. Try again.",
+      );
+    } finally {
+      window.clearTimeout(timer);
+      setLoading(false);
+    }
   }
 
   return (
@@ -52,7 +77,14 @@ export function QuotePanel({ payee, ready }: { payee: string; ready: boolean }) 
           Execute swap
         </button>
       </div>
-      {error ? <p className="error">{error}</p> : null}
+      {error ? (
+        <div className="banner" role="alert">
+          <p style={{ margin: "0 0 10px" }}>{error}</p>
+          <button className="btn secondary" type="button" onClick={loadQuote} disabled={loading}>
+            Try again
+          </button>
+        </div>
+      ) : null}
       {quote ? (
         <>
           <div className="quote-grid">

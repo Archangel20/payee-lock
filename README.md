@@ -13,7 +13,7 @@ No install. The site stays up through judging (18 November 2026, and ideally thr
 
 1. Payee Acme, chain Ethereum. Paste `0x4e8fa91c0d4e77b2c61890ab44f13c8e06e35d17` and check. See **Do not pay**, plus a lookalike warning (first 4 and last 6 characters match the address on file).
 2. Paste `0x4e8f1c2a9b7d6e5c3a18f0d4b27c91aa06e35d17` and check. See **Match**: this is Acme Treasury's real Ethereum address.
-3. Click **Get a live quote**. The page calls the public NEAR Intents API with a dry quote. It does not send funds, and it does not fill in amounts if the call fails. When Intents returns a quote, those amounts are shown and execution is labeled simulated. Checked on 10 November 2026: the hosted call returned HTTP 502 because Intents did not answer within 25 seconds.
+3. Click **Get a live quote**. If Intents answers, see its live amounts and a label that execution is simulated. If it does not answer within about 12 seconds, the page says "NEAR Intents didn't respond in time. Try again." and shows a retry button. It does not invent amounts or spin forever.
 4. Open `/demo`, choose **Propose the address swap**, and see a 3 minute countdown. During that window the old Ethereum address still matches. Then **Veto with the guardian key**. See the proposal removed.
 
 Curl examples and `scripts/agent-verify.mjs` are in [Try it](#try-it).
@@ -93,7 +93,7 @@ The site stays up through judging (18 November 2026, and ideally through 25 Nove
 
 1. Set the payee to Acme and the chain to Ethereum. Paste `0x4e8fa91c0d4e77b2c61890ab44f13c8e06e35d17` and click **Check this address**. See **Do not pay** ("This does not belong to Acme Treasury") and a lookalike warning. The warning reports the first 4 and last 6 characters.
 2. Paste `0x4e8f1c2a9b7d6e5c3a18f0d4b27c91aa06e35d17` and check again. See **Match** ("This is Acme Treasury's real Ethereum address").
-3. Click **Get a live quote**. The app calls `https://1click.chaindefuser.com/v0/quote` with `dry: true` for 10 USDC on NEAR, paid out as USDC on Ethereum to the address that currently matches. It does not send funds. If Intents returns a quote, the amounts on the page are those amounts and execution is labeled simulated. If Intents fails, the page shows the error and does not invent amounts. Checked on 10 November 2026 against this deployment: both the NEAR USDC quote and the Ethereum quote returned HTTP 502, `Failed to receive response within timeout of 25000ms for exchange "1Click-API:api-exchange"`.
+3. Click **Get a live quote**. The app calls `https://1click.chaindefuser.com/v0/quote` with `dry: true` for 10 USDC on NEAR, paid out as USDC on Ethereum to the address that currently matches. It does not send funds. If Intents returns a quote, the amounts on the page are those amounts and execution is labeled simulated. Each attempt waits at most about 12 seconds, then retries once. If both fail, the page says "NEAR Intents didn't respond in time. Try again." and offers **Try again**. It does not invent amounts.
 4. Open https://payee-lock.vercel.app/demo. Click **Propose the address swap**. See a countdown of 3 minutes (the payee's delay is 180 seconds). While it is counting, a check of `0x4e8f1c2a9b7d6e5c3a18f0d4b27c91aa06e35d17` still returns match, and the poisoned address is `pending_change`. Click **Veto with the guardian key**. See the proposal removed: the poisoned address is `no_match` again and the address on file is unchanged.
 
 These reads were checked against the hosted API:
@@ -132,7 +132,7 @@ Open http://localhost:3000.
 2. Replace the address with `0x4e8f1c2a9b7d6e5c3a18f0d4b27c91aa06e35d17` and check again.
    See a green **Match**: "This is Acme Treasury's real Ethereum address", then a payment panel.
 3. Click **Get a live quote**.
-   See real amounts from NEAR Intents and a banner that execution is simulated. **Execute swap** does not send funds. It explains that a non-dry quote was not requested.
+   See live NEAR Intents amounts and a banner that execution is simulated, or, if Intents is slow, "NEAR Intents didn't respond in time. Try again." with a retry button. **Execute swap** does not send funds.
 4. Open **Acme** in the header.
    See one address per chain, no pending change, and the registration in the activity log.
 
@@ -266,7 +266,7 @@ The site is a Next.js app at the repository root. No adapter and no wallet packa
 | Intents execution | **Simulated.** The UI says so. `dry: true` does not create a deposit address and this demo never sends funds. Intents has no testnet. |
 | The invoice email | A prop. The address in it is the poisoned example above. |
 
-If the quote request fails, the page shows the error. It does not invent amounts.
+If the quote request fails or times out, the page says so and does not invent amounts. A slow Intents call is cut off after about 12 seconds, with one retry.
 
 ## API
 
